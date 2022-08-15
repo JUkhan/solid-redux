@@ -19,7 +19,9 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "solid-js": ">=1.4.6"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -31,7 +33,8 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "app",
+  "name": "solid-redux",
+  "description": "State Management tool for solid.js",
   "author": "JUkhan",
   "module": "dist/app.esm.js",
   "size-limit": [
@@ -48,8 +51,22 @@
     "@size-limit/preset-small-lib": "^8.0.1",
     "husky": "^8.0.1",
     "size-limit": "^8.0.1",
+    "solid-js": "^1.4.8",
     "tsdx": "^0.14.1",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JUkhan/solid-redux.git"
+  },
+  "keywords": [
+    "redux",
+    "solid-redux",
+    "reactive"
+  ],
+  "bugs": {
+    "url": "https://github.com/JUkhan/solid-redux/issues"
+  },
+  "homepage": "https://github.com/JUkhan/solid-redux#readme"
 }
