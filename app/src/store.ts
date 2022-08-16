@@ -1,4 +1,10 @@
 import { AnyAction } from './typeHelper';
-import { createSignal } from 'solid-js';
+import { createSignal, Accessor, Setter } from 'solid-js';
 
-export const [action, dispatch] = createSignal<AnyAction>({} as any);
+const dispatcher = createSignal<AnyAction>({ type: '$$INIT' });
+
+//@ts-ignores
+export const action: Accessor<AnyAction> = dispatcher[0];
+
+//@ts-ignores
+export const dispatch: Setter<AnyAction> = dispatcher[1];
