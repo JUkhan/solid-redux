@@ -20,7 +20,7 @@ yarn add solid-redux
 ## Todo state
 
 ```ts
-import { createReducer, effectOn, PayloadAction } from 'solid-redux';
+import { createReducer, on, PayloadAction } from 'solid-redux';
 
 export interface Todo {
   id: number;
@@ -28,7 +28,6 @@ export interface Todo {
   completed: boolean;
 }
 let todoId = 0;
-
 export const {
   actions: { add, update, remove },
   state: todoState,
@@ -36,6 +35,10 @@ export const {
   name: 'todos',
   initialState: [] as Todo[],
   reducers: {
+    init(setState) {
+      setState([{ id: ++todoId, text: 'Cool', completed: false }]);
+      add('Awesome');
+    },
     add(setState, action: PayloadAction<string>) {
       setState((todos) => [
         ...todos,
@@ -55,10 +58,12 @@ export const {
   },
 });
 
-effectOn(add, (action) => {
-  //push new record to DB
-  console.log(action);
-});
+on(add, update, remove)
+  .debounce(1000)
+  .effect((action) => {
+    console.log(action);
+  });
+
 
 ```
 
@@ -66,9 +71,7 @@ effectOn(add, (action) => {
 
 ```tsx
 import { Component, For } from 'solid-js';
-import { dispatch } from 'solid-redux';
-import { add, update, remove, todoState } from './app-state/todoState';
-
+import { add, update, remove, todoState } from './todoState';
 
 const Todos: Component = () => {
   let input: HTMLInputElement = null!;
@@ -80,7 +83,7 @@ const Todos: Component = () => {
         <button
           onClick={(e) => {
             if (!input.value.trim()) return;
-            dispatch(add(input.value));
+            add(input.value);
             input.value = "";
           }}
         >
@@ -95,12 +98,12 @@ const Todos: Component = () => {
             <input
               type="checkbox"
               checked={todo.completed}
-              onchange={[dispatch, update(id)]}
+              onchange={[update, id]}
             />
             <span
               style={{ "text-decoration": todo.completed ? "line-through" : "none" }}
             >{text}</span>
-            <span onClick={[dispatch, remove(id)]} style={{ color: 'red', cursor: 'pointer' }}>X</span>
+            <span onClick={[remove, id]} style={{ color: 'red', cursor: 'pointer' }}>X</span>
           </div>
         }}
       </For>

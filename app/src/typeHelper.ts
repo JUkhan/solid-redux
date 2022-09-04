@@ -61,27 +61,26 @@ export type CreateReducer<
   actions: ReducerActions<R>;
   state: State;
 };
+export type ActionFn<T = any> =
+  | ActionCreatorWithPayload<T>
+  | ActionCreatorWithoutPayload;
 
-export type EffectHandler<A extends PayloadAction = PayloadAction> = (
-  action: A,
-  getState: () => any
-) => void;
+export type EffectHandler<A = any> = (action: PayloadAction<A>) => void;
 
 export type EffectHandlers = {
   [K: string]: EffectHandler<PayloadAction<any>>;
 };
 
-export type ValidateHandlers<ACR extends EffectHandlers> = ACR &
-  {
-    [T in keyof ACR]: ACR[T] extends {
-      handler(
-        dispatch: (action: AnyAction) => void,
-        getState: () => any,
-        action?: infer A
-      ): void;
-    }
-      ? {
-          prepare(...a: never[]): Omit<A, 'type'>;
-        }
-      : {};
-  };
+export type ValidateHandlers<ACR extends EffectHandlers> = ACR & {
+  [T in keyof ACR]: ACR[T] extends {
+    handler(
+      dispatch: (action: AnyAction) => void,
+      getState: () => any,
+      action?: infer A
+    ): void;
+  }
+    ? {
+        prepare(...a: never[]): Omit<A, 'type'>;
+      }
+    : {};
+};

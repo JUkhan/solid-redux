@@ -1,7 +1,8 @@
 import { createEffect } from 'solid-js';
+import { createStore } from 'solid-js/store';
 import { action } from './store';
 import { CreateReducer, ReducerMethods, ReducerOptions } from './typeHelper';
-import { createStore } from 'solid-js/store';
+import { createAction } from './createAction';
 
 /**
  * A function that accepts an initial state, an object full of reducer
@@ -23,7 +24,8 @@ export function createReducer<
     const type = `${options.name}_${key}`;
     //@ts-ignores
     options.reducers[type] = reducers[key];
-    obj[key] = (payload: any) => ({ type, payload });
+    //obj[key] = (payload: any) => ({ type, payload });
+    obj[key] = createAction(type);
     return obj;
   }, {} as any);
 
@@ -33,6 +35,6 @@ export function createReducer<
     //@ts-ignores
     if (typeof fx === 'function') fx(setState, ac as any);
   });
-
+  if (typeof actions.init === 'function') setTimeout(() => actions.init());
   return { actions, state };
 }

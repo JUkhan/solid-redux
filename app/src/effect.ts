@@ -1,17 +1,38 @@
 import { action } from './store';
 import { createEffect } from 'solid-js';
-import {
-  ActionCreatorWithoutPayload,
-  ActionCreatorWithPayload,
-} from './typeHelper';
+import { EffectHandler, ActionFn } from './typeHelper';
 
-export function effectOn<T>(
-  actionFn: ActionCreatorWithPayload<T> | ActionCreatorWithoutPayload,
-  callback: (ac: ReturnType<typeof actionFn>) => void
-) {
-  const { type } = actionFn(undefined as any);
+function debounce(func: any, timeout = 300) {
+  let timer: any;
+  return (...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      //@ts-ignore
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+function subscribeEffect(actions: string[], callback: EffectHandler) {
   createEffect(() => {
     const ac = action();
-    if (ac.type === type) callback(ac as any);
+    if (actions.includes(ac.type)) callback(ac as any);
   });
+}
+
+export function on(...actions: ActionFn[]) {
+  let _actions: string[] = actions.map((actionFn: any) => actionFn._$atype);
+
+  return {
+    debounce(milliseconds: number) {
+      return {
+        effect<T = any>(handlerFn: EffectHandler<T>) {
+          return subscribeEffect(_actions, debounce(handlerFn, milliseconds));
+        },
+      };
+    },
+    effect<T = any>(handlerFn: EffectHandler<T>) {
+      return subscribeEffect(_actions, handlerFn);
+    },
+  };
 }
