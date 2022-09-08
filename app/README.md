@@ -64,7 +64,17 @@ on(add, update, remove)
     console.log(action);
   });
 
+const loadData = createAction('loadData');
+type Data = { loading: boolean; data: any };
 
+const data = on(loadData)
+  .select<Data>(
+    async (action, sendData) => {
+      await delay(1000);
+      sendData({ loading: true, data: 101 });
+    },
+    { loading: false, data: null }
+  );
 ```
 
 ## Apply todoState in the solid component
