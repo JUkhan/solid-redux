@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from 'solid-js';
+import { createEffect, createSignal, Accessor } from 'solid-js';
 import { EffectHandler, ActionFn, SelectHandler } from './typeHelper';
 import { action } from './store';
 
@@ -41,7 +41,7 @@ export function on(...actions: ActionFn[]) {
         effect<T = any>(handlerFn: EffectHandler<T>) {
           return subscribeEffect(_actions, debounce(handlerFn, milliseconds));
         },
-        select<T = any>(handlerFn: SelectHandler<T>, init: T) {
+        select<T = any>(handlerFn: SelectHandler<T>, init: T): Accessor<T> {
           const [data, setData] = createSignal(init);
           subscribeEffectForSelection(
             _actions,
@@ -54,7 +54,7 @@ export function on(...actions: ActionFn[]) {
     effect<T = any>(handlerFn: EffectHandler<T>) {
       return subscribeEffect(_actions, handlerFn);
     },
-    select<T = any>(handlerFn: SelectHandler<T>, init: T) {
+    select<T = any>(handlerFn: SelectHandler<T>, init: T): Accessor<T> {
       const [data, setData] = createSignal(init);
       subscribeEffectForSelection(_actions, (action: any) =>
         handlerFn(action, setData)
