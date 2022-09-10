@@ -14,7 +14,11 @@ export type Reducer<S = any, A extends Action = AnyAction> = (
 
 export type SelectHandler<T = any> = (
   action: PayloadAction<any>,
-  sendData: (data: T) => void
+  data: {
+    loading: () => void;
+    success: (data: T) => void;
+    error: (msg: any) => void;
+  }
 ) => void;
 
 export type ReducerMethods<State> = {
@@ -67,7 +71,11 @@ export type CreateReducer<
   actions: ReducerActions<R>;
   state: State;
 };
-
+export type SelectState<T> = {
+  loading: boolean;
+  data: T;
+  msg: any;
+};
 export type ActionFn<T = any> =
   | ActionCreatorWithPayload<T>
   | ActionCreatorWithoutPayload;

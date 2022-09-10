@@ -1,5 +1,10 @@
 import { createEffect, createSignal, Accessor } from 'solid-js';
-import { EffectHandler, ActionFn, SelectHandler } from './typeHelper';
+import {
+  EffectHandler,
+  ActionFn,
+  SelectHandler,
+  SelectState,
+} from './typeHelper';
 import { action } from './store';
 
 function debounce(func: any, timeout = 300) {
@@ -41,11 +46,19 @@ export function on(...actions: ActionFn[]) {
         effect<T = any>(handlerFn: EffectHandler<T>) {
           return subscribeEffect(_actions, debounce(handlerFn, milliseconds));
         },
-        select<T = any>(handlerFn: SelectHandler<T>, init: T): Accessor<T> {
-          const [data, setData] = createSignal(init);
+        select<T = any>(
+          handlerFn: SelectHandler<T>,
+          init: T
+        ): Accessor<SelectState<T>> {
+          const [data, setData] = createSignal({
+            loading: false,
+            data: init,
+            msg: null,
+          } as SelectState<T>);
+          const dataFn = syncData<T>(setData);
           subscribeEffectForSelection(
             _actions,
-            debounce((action: any) => handlerFn(action, setData), milliseconds)
+            debounce((action: any) => handlerFn(action, dataFn), milliseconds)
           );
           return data;
         },
@@ -54,12 +67,33 @@ export function on(...actions: ActionFn[]) {
     effect<T = any>(handlerFn: EffectHandler<T>) {
       return subscribeEffect(_actions, handlerFn);
     },
-    select<T = any>(handlerFn: SelectHandler<T>, init: T): Accessor<T> {
-      const [data, setData] = createSignal(init);
+    select<T = any>(
+      handlerFn: SelectHandler<T>,
+      init: T
+    ): Accessor<SelectState<T>> {
+      const [data, setData] = createSignal({
+        loading: false,
+        data: init,
+        msg: null,
+      } as SelectState<T>);
+      const dataFn = syncData<T>(setData);
       subscribeEffectForSelection(_actions, (action: any) =>
-        handlerFn(action, setData)
+        handlerFn(action, dataFn)
       );
       return data;
+    },
+  };
+}
+function syncData<T>(state: any) {
+  return {
+    loading() {
+      state((s: any) => ({ ...s, loading: true }));
+    },
+    success(data: T) {
+      state(() => ({ msg: null, data, loading: false }));
+    },
+    error(msg: any) {
+      state((s: any) => ({ ...s, msg }));
     },
   };
 }
