@@ -1,5 +1,6 @@
 # solid-redux
-State Management Tool for `solid.js`
+
+State Management Tools for `solid.js`. It is just using `createSignal` and `createStore` but it's dispatching action under the hood. You can have effects on the actions, debouncing, and selection. This tool provides you with action methods. You don't need to dispatch anything it's automatic. This tool has been designed considering zero boilerplate and ceremony on the state management code base.
 
 ## Installation
 
@@ -22,7 +23,6 @@ yarn add solid-redux
 ```ts
 import { createReducer, on, PayloadAction } from 'solid-redux';
 
-export const loadData = createAction('loadData');
 export interface Todo {
   id: number;
   text: string;
@@ -80,7 +80,8 @@ export const {
   },
 });
 
-type Data = { loading: boolean; data: any };
+export const loadData = createAction('loadData');
+
 on(add, update, remove)
   .debounce(1000)
   .effect((action) => {

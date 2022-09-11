@@ -50,17 +50,17 @@ export function on(...actions: ActionFn[]) {
           handlerFn: SelectHandler<T>,
           init: T
         ): Accessor<SelectState<T>> {
-          const [data, setData] = createSignal({
+          const arr = createSignal({
             loading: false,
             data: init,
             msg: null,
           } as SelectState<T>);
-          const dataFn = syncData<T>(setData);
+          const dataFn = syncData<T>(arr[1]);
           subscribeEffectForSelection(
             _actions,
             debounce((action: any) => handlerFn(action, dataFn), milliseconds)
           );
-          return data;
+          return arr[0];
         },
       };
     },
@@ -71,29 +71,29 @@ export function on(...actions: ActionFn[]) {
       handlerFn: SelectHandler<T>,
       init: T
     ): Accessor<SelectState<T>> {
-      const [data, setData] = createSignal({
+      const arr = createSignal({
         loading: false,
         data: init,
         msg: null,
       } as SelectState<T>);
-      const dataFn = syncData<T>(setData);
+      const dataFn = syncData<T>(arr[1]);
       subscribeEffectForSelection(_actions, (action: any) =>
         handlerFn(action, dataFn)
       );
-      return data;
+      return arr[0];
     },
   };
 }
 function syncData<T>(state: any) {
   return {
     loading() {
-      state((s: any) => ({ ...s, loading: true }));
+      state((s: any) => ({ data: s.data, msg: null, loading: true }));
     },
     success(data: T) {
       state(() => ({ msg: null, data, loading: false }));
     },
     error(msg: any) {
-      state((s: any) => ({ ...s, msg }));
+      state((s: any) => ({ loading: s.loading, data: s.data, msg }));
     },
   };
 }
